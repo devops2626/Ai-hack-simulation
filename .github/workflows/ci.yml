@@ -35,7 +35,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build multi-platform Docker image (with cache)
+      - name: Build multi-arch Docker image (with cache)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -44,3 +44,7 @@ jobs:
           tags: ai-hacking-simulator:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Inspect multi-arch manifest
+        run: |
+          docker buildx imagetools inspect ai-hacking-simulator:latest || echo "Manifest inspection skipped (build-only mode)"
