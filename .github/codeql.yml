@@ -1,0 +1,7 @@
+name: "CodeQL config"
+
+query-filters:
+  - include:
+      id: py/
+  - exclude:
+      id: py/clear-text-logging-sensitive-data # Educational project
