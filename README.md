@@ -18,4 +18,15 @@ This is a **sandboxed simulation** of the OpenAI vs Hugging Face incident (July 
 
 See [docs/attack_flow.md](docs/attack_flow.md) for the technical walkthrough.
 
+## SAST Tools Comparison
+
+| Tool          | Speed     | Depth          | Best For                          | In Project? | Custom Rules |
+|---------------|-----------|----------------|-----------------------------------|-------------|--------------|
+| **Semgrep**   | Very Fast | Good           | Custom rules, Flask/SSTI          | Yes        | Excellent   |
+| **CodeQL**    | Medium    | Excellent      | Semantic analysis                 | Yes        | Good        |
+| **Bandit**    | Fast      | Good           | Python-specific security          | Ready      | Good        |
+| **Trivy**     | Fast      | Good           | Container scanning                | Yes        | Limited     |
+
 ## License: MIT
+
+Powered by **Grok** (built by xAI)
