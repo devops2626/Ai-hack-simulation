@@ -45,6 +45,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Inspect multi-arch manifest
+      - name: Detailed multi-arch manifest inspection
         run: |
-          docker buildx imagetools inspect ai-hacking-simulator:latest || echo "Manifest inspection skipped (build-only mode)"
+          echo "=== Docker Buildx Builder Info ==="
+          docker buildx ls
+          echo ""
+          echo "=== Inspecting multi-arch image manifest ==="
+          docker buildx imagetools inspect ai-hacking-simulator:latest || echo "Manifest inspection (build-only mode)"
+          echo ""
+          echo "=== Image layers and platforms ==="
+          docker images --format "{{.Repository}}:{{.Tag}} ({{.Size}})" ai-hacking-simulator || true
