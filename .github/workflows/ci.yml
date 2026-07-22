@@ -70,3 +70,12 @@ jobs:
             echo "❌ Multi-arch verification FAILED"
             exit 1
           fi
+
+      - name: Vulnerability Scan (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'ai-hacking-simulator:latest'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
