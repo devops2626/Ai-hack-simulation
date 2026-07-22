@@ -3,8 +3,9 @@
 > **⚠️ WARNING:** This project is for **educational and defensive security research only.**  
 > Do not use against any system without explicit written permission.
 
-**Author:** Barki Mustapha (devops2626) — Engineering Automation
-**Email:** devops26@icloud.com
+**Author:** Barki Mustapha (devops2626) — Engineering Automation  
+**Email:** devops26@icloud.com  
+**LinkedIn:** [Barki Mustapha](https://www.linkedin.com/in/barki-mustapha/)
 
 This is a **sandboxed simulation** of the OpenAI vs Hugging Face incident (July 2026), showing how an AI agent chains zero‑days.
 
