@@ -19,7 +19,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install -r requirements.txt bandit
 
       - name: Run AI Agent Simulation
         run: python src/agent.py
@@ -28,6 +28,11 @@ jobs:
         run: |
           python src/vulnerable_server.py & sleep 3
           python examples/payload_demo.py
+
+      - name: Bandit Security Scan
+        run: |
+          bandit -r src/ examples/ -ll --format json --output bandit-report.json || echo "Bandit scan completed (educational vulns expected)"
+          cat bandit-report.json || true
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
