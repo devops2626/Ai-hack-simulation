@@ -1,0 +1,14 @@
+version: '3'
+services:
+  vulnerable-server:
+    build: .
+    command: python src/vulnerable_server.py
+    ports: ["5000:5000"]
+  ai-agent:
+    build: .
+    command: python src/agent.py
+    depends_on: [vulnerable-server]
+  payload-tester:
+    build: .
+    command: python examples/payload_demo.py
+    profiles: [test]
