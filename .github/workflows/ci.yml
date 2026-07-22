@@ -29,5 +29,14 @@ jobs:
           python src/vulnerable_server.py & sleep 3
           python examples/payload_demo.py
 
-      - name: Docker Build Test
-        run: docker build -t ai-hacking-simulator .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and cache Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: ai-hacking-simulator:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
