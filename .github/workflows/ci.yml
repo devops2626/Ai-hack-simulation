@@ -80,6 +80,11 @@ jobs:
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
 
+      - name: Semgrep Scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: .semgrep.yml
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:

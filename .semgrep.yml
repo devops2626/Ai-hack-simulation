@@ -1,0 +1,21 @@
+# Semgrep configuration for AI Hacking Simulator
+
+# Rules focused on security for educational simulation
+rules:
+  - id: python.lang.security.audit.insecure-hash-algorithms
+  - id: python.django.security.audit.xss
+  - id: python.flask.security.audit.template-string-injection
+    severity: WARNING
+  - id: python.lang.security.injection.command-injection
+  - id: python.lang.security.injection.sql-injection
+
+# Custom exclusions for educational/demo code
+exclude:
+  - path: src/vulnerable_server.py  # Intentionally vulnerable for learning
+    reason: "Educational SSTI/RCE demo"
+
+# Recommended community packs
+requires:
+  - p/python
+  - p/secrets
+  - p/flask
