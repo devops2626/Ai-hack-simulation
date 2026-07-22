@@ -1,0 +1,19 @@
+# Semgrep ignore file for AI Hacking Simulator
+
+# Intentionally vulnerable files for educational purposes
+src/vulnerable_server.py
+examples/payload_demo.py
+
+# Test and simulation files
+**/test_*
+**/*test*.py
+
+# Generated or cache files
+__pycache__/
+*.pyc
+*.log
+
+# Docker context (scanned separately)
+Dockerfile
+*.yml
+*.yaml
