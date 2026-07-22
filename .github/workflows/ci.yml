@@ -55,3 +55,18 @@ jobs:
           echo ""
           echo "=== Image layers and platforms ==="
           docker images --format "{{.Repository}}:{{.Tag}} ({{.Size}})" ai-hacking-simulator || true
+
+      - name: Automated multi-arch verification
+        run: |
+          echo "Verifying multi-arch support..."
+          MANIFEST=$(docker buildx imagetools inspect ai-hacking-simulator:latest --format '{{json .Manifests}}' 2>/dev/null || echo '[]')
+          AMD64=$(echo $MANIFEST | grep -o 'linux/amd64' | wc -l)
+          ARM64=$(echo $MANIFEST | grep -o 'linux/arm64' | wc -l)
+          echo "Found AMD64 platforms: $AMD64"
+          echo "Found ARM64 platforms: $ARM64"
+          if [ "$AMD64" -ge 1 ] && [ "$ARM64" -ge 1 ]; then
+            echo "✅ Multi-arch manifest verification PASSED"
+          else
+            echo "❌ Multi-arch verification FAILED"
+            exit 1
+          fi
