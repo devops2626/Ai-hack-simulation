@@ -7,7 +7,7 @@
 **Email:** devops26@icloud.com  
 **LinkedIn:** [Barki Mustapha](https://www.linkedin.com/in/start-export/)  
 **GitHub:** [devops2626](https://github.com/devops2626)
-
+[![CodeQL](https://github.com/devops2626/Ai-hack-simulation/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/devops2626/Ai-hack-simulation/security/code-scanning)
 This is a **sandboxed simulation** of the OpenAI vs Hugging Face incident (July 2026), showing how an AI agent chains zero‑days.
 
 ## Quick Commands
