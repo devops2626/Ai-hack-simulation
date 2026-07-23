@@ -5,7 +5,7 @@ app = Flask(__name__)
 @app.route('/load_dataset')
 def load():
     config = request.args.get('config', '{}')
-    template = f"<html><body>Config: {config}</body></html>"
+    template = "<html><body>Config: {{ config }}</body></html>"
     return render_template_string(template, config=config)
 
 @app.route('/api/answers')
