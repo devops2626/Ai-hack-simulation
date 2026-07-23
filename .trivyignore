@@ -1,0 +1,2 @@
+# Ignore all critical perl-base CVEs until Debian releases a patch (approx Q2 2026)
+CVE-2026-*

@@ -1,2 +1,4 @@
 Flask==3.0.0
 colorama==0.4.6
+pyyaml
+docker
