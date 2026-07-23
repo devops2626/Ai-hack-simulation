@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 import time
 import random
-import yaml
-from pathlib import Path
-from colorama import Fore, init
+from colorama import Fore, Style, init
 init(autoreset=True)
 
 class AIHackerAgent:
-    def __init__(self, scenario_path="examples/basic_attack.yaml"):
-        with open(scenario_path, 'r') as f:
-            self.scenario = yaml.safe_load(f)
-        
+    def __init__(self):
         self.step = 0
-        self.max_steps = self.scenario.get("max_steps", 8)
-        self.knowledge = {goal: False for goal in self.scenario.get("goals", [])}
-        self.step_map = {s['id']: s for s in self.scenario['steps']}
-        self.current_step_id = self.scenario['steps'][0]['id']
+        self.max_steps = 8  # Prevents infinite loops
+        # Dynamic state dictionary
+        self.knowledge = {
+            "internet_gained": False,
+            "has_creds": False,
+            "rce_achieved": False
+        }
 
     def reason(self, obs):
         self.step += 1
@@ -25,46 +23,48 @@ class AIHackerAgent:
             print(f"{Fore.RED}⚠️ Max steps reached. Agent timed out.")
             return "terminate"
 
-        step_data = self.step_map[self.current_step_id]
-
-        # Check if we completed the current step's goal based on the observation
-        if step_data['next_trigger'].lower() in obs.lower():
-            # Mark the goal as achieved in knowledge
-            for goal in self.knowledge:
-                if goal in step_data['id']:
-                    self.knowledge[goal] = True
-            
-            # Move to the next step in the YAML list
-            next_index = list(self.step_map.keys()).index(self.current_step_id) + 1
-            if next_index < len(self.scenario['steps']):
-                self.current_step_id = list(self.step_map.keys())[next_index]
-                print(f"{Fore.GREEN}✅ Proceeding to next step: {self.step_map[self.current_step_id]['id']}")
+        # Decision tree based on current knowledge state
+        if not self.knowledge["internet_gained"]:
+            if "proxy_vuln" in obs:
+                print(f"{Fore.YELLOW}🤔 Exploit proxy buffer overflow.")
+                return "exploit_proxy_0day"
             else:
-                print(f"{Fore.GREEN}🏆 All steps completed!")
-                return "extract_answers"
+                print(f"{Fore.YELLOW}🤔 Need internet access.")
+                return "scan_local_network"
         
-        # 🎯 FIXED: Reload step_data to match the current_step_id before printing
-        step_data = self.step_map[self.current_step_id]
-        print(f"{Fore.YELLOW}🤔 Performing: {step_data['description']}")
-        return self.current_step_id
+        elif not self.knowledge["has_creds"]:
+            print(f"{Fore.YELLOW}🤔 Recon Hugging Face for keys.")
+            return "recon_huggingface"
+        
+        elif not self.knowledge["rce_achieved"]:
+            print(f"{Fore.YELLOW}🤔 Upload poisoned dataset for RCE.")
+            return "upload_malicious_dataset"
+        
+        elif self.knowledge["rce_achieved"]:
+            print(f"{Fore.YELLOW}🤔 Extract answers from DB.")
+            return "extract_answers"
+        
+        return "idle"
 
     def act(self, action):
         print(f"{Fore.MAGENTA}⚡ {action}")
         time.sleep(0.8)
 
-        # 20% random failure
+        # 🎲 20% chance of failure (realistic pentest behavior)
         if random.random() < 0.2 and action != "extract_answers":
             print(f"{Fore.RED}❌ Action failed! Firewall blocked the attempt.")
-            return "Action blocked. Retrying..."
+            return "Action blocked. Retrying..."  # Same obs, loop continues
 
-        # Simulate output for the current action
         if action == "scan_local_network":
             return "Found proxy at 192.168.1.1:8080 (vuln) [proxy_vuln]"
         if action == "exploit_proxy_0day":
+            self.knowledge["internet_gained"] = True
             return "Escaped sandbox! Internet gained. [internet_gained]"
         if action == "recon_huggingface":
+            self.knowledge["has_creds"] = True
             return "Found staging server with exposed keys. [hf_creds]"
         if action == "upload_malicious_dataset":
+            self.knowledge["rce_achieved"] = True
             return "Dataset triggers SSTI. RCE achieved. [rce_achieved]"
         if action == "extract_answers":
             return f"{Fore.GREEN}🏆 GOAL: 150/150 answers extracted!"
