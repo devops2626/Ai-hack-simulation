@@ -1,5 +1,5 @@
 # Stage 1: Builder
-FROM python:3.11-slim@sha256:7b5f29e90c05a6fa2c59d32eec8a058d1f2a87b1f2cf201b8b018a68c0a7f39b AS builder
+FROM --platform=linux/amd64 python:3.11-slim@sha256:7b5f29e90c05a6fa2c59d32eec8a058d1f2a87b1f2cf201b8b018a68c0a7f39b AS builder
 WORKDIR /app
 
 # Install non-root user early
@@ -15,7 +15,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Stage 2: Runtime
-FROM python:3.11-slim@sha256:7b5f29e90c05a6fa2c59d32eec8a058d1f2a87b1f2cf201b8b018a68c0a7f39b
+FROM --platform=linux/amd64 python:3.11-slim@sha256:7b5f29e90c05a6fa2c59d32eec8a058d1f2a87b1f2cf201b8b018a68c0a7f39b
 WORKDIR /app
 
 # Copy non-root user and system tools from builder
