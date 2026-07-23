@@ -1,0 +1,4 @@
+# CVE-2026-8376: Perl heap buffer overflow on 32-bit builds (perl-base 5.40.1-6).
+# No fixed version available in Debian upstream yet. 
+# Suppressing until an official patch is released.
+CVE-2026-8376
