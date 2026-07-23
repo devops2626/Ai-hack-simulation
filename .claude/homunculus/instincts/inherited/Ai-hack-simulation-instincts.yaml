@@ -1,0 +1,176 @@
+# Instincts generated from https://github.com/devops2626/Ai-hack-simulation
+# Generated: 2026-07-23T03:52:36.574Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: Ai-hack-simulation-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Commit Length
+
+## Action
+
+Keep commit messages concise (~46 characters)
+
+## Evidence
+
+- Average commit message length: 46 chars
+- Based on 19 commits
+
+---
+id: Ai-hack-simulation-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: Ai-hack-simulation-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: Ai-hack-simulation-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: Ai-hack-simulation-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: Ai-hack-simulation-workflow-update-funding-configuration
+trigger: "when doing update funding configuration"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Workflow Update Funding Configuration
+
+## Action
+
+Follow the update-funding-configuration workflow:
+1. Edit .github/FUNDING.yml with new or updated funding entries.
+2. Commit and push the changes.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: .github/FUNDING.yml
+
+---
+id: Ai-hack-simulation-workflow-dockerfile-security-hardening
+trigger: "when doing dockerfile security hardening"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Workflow Dockerfile Security Hardening
+
+## Action
+
+Follow the dockerfile-security-hardening workflow:
+1. Edit Dockerfile to improve security or build process.
+2. Optionally update .trivyignore to suppress known CVEs.
+3. Commit and push the changes.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: Dockerfile, .trivyignore
+
+---
+id: Ai-hack-simulation-workflow-suppress-cve-in-trivyignore
+trigger: "when doing suppress cve in trivyignore"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Workflow Suppress Cve In Trivyignore
+
+## Action
+
+Follow the suppress-cve-in-trivyignore workflow:
+1. Edit .trivyignore to add or update CVE entries.
+2. Commit and push the changes.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: .trivyignore
+
