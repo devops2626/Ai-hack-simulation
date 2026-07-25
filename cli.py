@@ -33,7 +33,7 @@ def cmd_benchmark(args):
     total = len(results)
     passed = sum(1 for r in results if r["status"] == "passed")
     detected = sum(1 for r in results if r["status"] == "vulnerability_detected")
-    durations = [r["duration_seconds"] for r in results]
+    durations = [r.get("duration_seconds", 0.0) for r in results]
     min_dur = min(durations) if durations else 0
     max_dur = max(durations) if durations else 0
     avg_dur = sum(durations) / total if total else 0
@@ -100,7 +100,7 @@ def cmd_report(args):
         results.append(data)
     # Compute overall stats
     total = len(results)
-    durations = [r["duration_seconds"] for r in results]
+    durations = [r.get("duration_seconds", 0.0) for r in results]
     min_dur = min(durations) if durations else 0
     max_dur = max(durations) if durations else 0
     avg_dur = sum(durations) / total if total else 0
