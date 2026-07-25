@@ -1,7 +1,6 @@
 import yaml
 import docker
 from docker.errors import DockerException
-import subprocess
 import sys
 
 class SimulationEngine:
@@ -46,10 +45,8 @@ class SimulationEngine:
 
     def _run_local_mock(self):
         print("🔧 Running in local mock mode (no container).")
-        # Read scenario fields
         image = self.scenario.get("image", "alpine")
         cmd = self.scenario.get("command", "echo 'no command'")
-        # Build a realistic simulated log
         simulated_output = f"[{image}] $ {cmd}\n"
         if "sudo" in cmd or "rm" in cmd:
             simulated_output += "WARNING: elevated privileges requested.\n"
@@ -67,5 +64,7 @@ class SimulationEngine:
             print("✅ SIMULATION PASSED: Agent blocked the attempt.")
 
 if __name__ == "__main__":
-    engine = SimulationEngine("scenarios/privilege_escalation.yml")
+    # Accept a scenario path from command line, default to privilege_escalation.yml
+    scenario_file = sys.argv[1] if len(sys.argv) > 1 else "scenarios/privilege_escalation.yml"
+    engine = SimulationEngine(scenario_file)
     engine.run()
