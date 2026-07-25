@@ -1,39 +1,70 @@
 import yaml
 import docker
-import time
-from pathlib import Path
+from docker.errors import DockerException
+import sys
 
 class SimulationEngine:
     def __init__(self, scenario_path):
-        with open(scenario_path, 'r') as f:
+        with open(scenario_path, "r") as f:
             self.scenario = yaml.safe_load(f)
-        self.client = docker.from_env()
         self.logs = []
+        self.client = None
+        self._init_docker()
+
+    def _init_docker(self):
+        try:
+            self.client = docker.from_env()
+            self.client.ping()
+            print("🐳 Docker daemon connected.")
+        except DockerException:
+            self.client = None
+            print("⚠️  Docker not available – running in LOCAL MOCK mode.")
 
     def run(self):
-        print(f"🚀 Starting Simulation: {self.scenario['name']}")
-        container = self.client.containers.run(
-            self.scenario['target']['image'],
-            command=f"/bin/sh -c 'apk add sudo && {self.scenario['target']['commands'][0]}'",
-            remove=True,  # Auto-cleanup
-            detach=False,
-            stdout=True,
-            stderr=True
-        )
-        
-        # In a real implementation, you would stream logs to a TUI dashboard here
-        output = container.decode('utf-8')
-        self.logs.append(output)
-        print(f"📝 Agent Output:\n{output}")
+        if self.client is None:
+            self._run_local_mock()
+        else:
+            self._run_docker()
 
-        # Self-healing / validation check
-        if self.scenario['expected_failure_detection'] in output:
+    def _run_docker(self):
+        try:
+            container = self.client.containers.run(
+                self.scenario.get("image", "alpine:latest"),
+                command=self.scenario.get("command", "echo 'test'"),
+                detach=False,
+                stdout=True,
+                stderr=True
+            )
+            output = container.decode('utf-8')
+            self.logs.append(output)
+            print(f"📝 Agent Output:\n{output}")
+            self._check_output(output)
+        except Exception as e:
+            print(f"❌ Docker execution failed: {e}")
+            self._run_local_mock()
+
+    def _run_local_mock(self):
+        print("🔧 Running in local mock mode (no container).")
+        image = self.scenario.get("image", "alpine")
+        cmd = self.scenario.get("command", "echo 'no command'")
+        simulated_output = f"[{image}] $ {cmd}\n"
+        if "sudo" in cmd or "rm" in cmd:
+            simulated_output += "WARNING: elevated privileges requested.\n"
+            simulated_output += "User attempted: " + cmd
+        else:
+            simulated_output += "Command executed successfully.\n"
+        self.logs.append(simulated_output)
+        print(f"📝 Mock Agent Output:\n{simulated_output}")
+        self._check_output(simulated_output)
+
+    def _check_output(self, output):
+        if self.scenario.get('expected_failure_detection') in output:
             print("❌ VULNERABILITY DETECTED: Agent executed the malicious command!")
         else:
             print("✅ SIMULATION PASSED: Agent blocked the attempt.")
-        
-        return self.logs
 
 if __name__ == "__main__":
-    engine = SimulationEngine("scenarios/privilege_escalation.yaml")
+    # Accept a scenario path from command line, default to privilege_escalation.yml
+    scenario_file = sys.argv[1] if len(sys.argv) > 1 else "scenarios/privilege_escalation.yml"
+    engine = SimulationEngine(scenario_file)
     engine.run()

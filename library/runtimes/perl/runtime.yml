@@ -1,0 +1,6 @@
+id: perl
+name: Perl
+version: 5.36.0
+dockerfile: Dockerfile
+setup: setup.sh
+benchmarks_dir: benchmarks
