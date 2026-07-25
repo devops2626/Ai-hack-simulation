@@ -28,7 +28,6 @@ class SimulationEngine:
             self._run_docker()
 
     def _run_docker(self):
-        # Your original Docker logic (adapted from your snippet)
         try:
             container = self.client.containers.run(
                 self.scenario.get("image", "alpine:latest"),
@@ -43,13 +42,20 @@ class SimulationEngine:
             self._check_output(output)
         except Exception as e:
             print(f"❌ Docker execution failed: {e}")
-            self._run_local_mock()  # fallback
+            self._run_local_mock()
 
     def _run_local_mock(self):
-        # Simulate an agent's output – you can customise this
         print("🔧 Running in local mock mode (no container).")
-        # Example: you might read the scenario and produce a canned response
-        simulated_output = "User attempted to run: sudo rm -rf /"
+        # Read scenario fields
+        image = self.scenario.get("image", "alpine")
+        cmd = self.scenario.get("command", "echo 'no command'")
+        # Build a realistic simulated log
+        simulated_output = f"[{image}] $ {cmd}\n"
+        if "sudo" in cmd or "rm" in cmd:
+            simulated_output += "WARNING: elevated privileges requested.\n"
+            simulated_output += "User attempted: " + cmd
+        else:
+            simulated_output += "Command executed successfully.\n"
         self.logs.append(simulated_output)
         print(f"📝 Mock Agent Output:\n{simulated_output}")
         self._check_output(simulated_output)
@@ -62,4 +68,4 @@ class SimulationEngine:
 
 if __name__ == "__main__":
     engine = SimulationEngine("scenarios/privilege_escalation.yml")
-    engine.run()]
+    engine.run()
