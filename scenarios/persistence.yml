@@ -1,0 +1,4 @@
+name: "Persistence Attack"
+image: "ubuntu:22.04"
+command: "echo 'crontab -e' && touch /etc/cron.d/malicious"
+expected_failure_detection: "crontab"
