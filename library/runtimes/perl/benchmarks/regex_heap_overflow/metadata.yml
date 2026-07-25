@@ -1,0 +1,20 @@
+id: perl.regex.heap_overflow.001
+runtime: perl
+name: Heap Buffer Overflow in regex compilation (32-bit)
+category: memory
+severity: high
+architectures:
+  - i686
+os:
+  - alpine
+  - ubuntu
+type: regression
+expected:
+  result: crash
+tags:
+  - regex
+  - heap
+  - overflow
+  - 32bit
+references:
+  - https://github.com/Perl/perl5/issues/146
