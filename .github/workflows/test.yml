@@ -1,0 +1,27 @@
+name: Test AI-Hack-Simulation
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          pip install docker pyyaml
+      - name: Run doctor
+        run: python3 main.py doctor
+      - name: Run benchmark (perl)
+        run: python3 main.py benchmark --runtime perl
+      - name: Generate report
+        run: python3 main.py report
+      - name: Upload reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: reports
+          path: reports/
