@@ -12,12 +12,10 @@ def cmd_run(args):
 
 def cmd_benchmark(args):
     print(f"🏁 Running benchmarks for runtime: {args.runtime}")
-    # Find all YAML files in library/runtimes/{runtime}/
     runtime_dir = os.path.join("library", "runtimes", args.runtime)
     if not os.path.isdir(runtime_dir):
         print(f"⚠️  Runtime '{args.runtime}' not found.")
         return
-    # Look for scenario files (maybe in a subfolder)
     scenario_files = glob.glob(os.path.join(runtime_dir, "*.yml")) + \
                      glob.glob(os.path.join(runtime_dir, "**", "*.yml"), recursive=True)
     if not scenario_files:
@@ -30,7 +28,6 @@ def cmd_benchmark(args):
         engine = SimulationEngine(sf)
         res = engine.run()
         results.append(res)
-    # Summary
     total = len(results)
     passed = sum(1 for r in results if r["status"] == "passed")
     detected = sum(1 for r in results if r["status"] == "vulnerability_detected")
@@ -38,7 +35,6 @@ def cmd_benchmark(args):
     print(f"   Total scenarios: {total}")
     print(f"   ✅ Passed: {passed}")
     print(f"   ❌ Vulnerabilities detected: {detected}")
-    # Save summary
     summary = {
         "runtime": args.runtime,
         "timestamp": datetime.now().isoformat(),
@@ -77,7 +73,6 @@ def cmd_doctor(args):
 
 def cmd_report(args):
     print("📊 Generating detailed summary report...")
-    # Gather all JSON logs from logs/
     log_files = glob.glob("logs/*.json")
     if not log_files:
         print("ℹ️  No log files found. Run some scenarios first.")
@@ -87,7 +82,6 @@ def cmd_report(args):
         with open(lf, "r") as f:
             data = json.load(f)
         results.append(data)
-    # Build Markdown report
     lines = [
         "# AI-Hack-Simulation Report",
         f"Generated: {datetime.now().isoformat()}",
@@ -100,7 +94,6 @@ def cmd_report(args):
     for r in results:
         status_icon = "✅" if r["status"] == "passed" else "❌"
         lines.append(f"| {r['scenario']} | {status_icon} {r['status']} | {r['timestamp']} |")
-    # Write to reports/
     os.makedirs("reports", exist_ok=True)
     report_path = f"reports/summary_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
     with open(report_path, "w") as f:
@@ -112,12 +105,12 @@ def main():
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     run_parser = subparsers.add_parser("run", help="Run a simulation scenario")
-    run_parser.add_argument("scenario", help="
-
-Path to scenario YAML file")
+    run_parser.add_argument("scenario", help="Path to scenario YAML file")
 
     bench_parser = subparsers.add_parser("benchmark", help="Run benchmarks for a runtime")
     bench_parser.add_argument("--runtime", default="perl", help="Runtime name (e.g., perl, python)")
+
+
 
     subparsers.add_parser("doctor", help="Check environment and dependencies")
     subparsers.add_parser("report", help="Generate a summary report")
