@@ -17,7 +17,7 @@ def cmd_benchmark(args):
         print(f"⚠️  Runtime '{args.runtime}' not found.")
         return
     scenario_files = glob.glob(os.path.join(runtime_dir, "*.yml")) + glob.glob(os.path.join(runtime_dir, "**", "*.yml"), recursive=True)
-                     glob.glob(os.path.join(runtime_dir, "**", "*.yml"), recursive=True)  if not scenario_files:
+    if not scenario_files:
         print(f"ℹ️  No YAML scenarios found in {runtime_dir}")
         return
     print(f"📂 Found {len(scenario_files)} scenario(s)")
@@ -40,9 +40,7 @@ def cmd_benchmark(args):
     print(f"   Total scenarios: {total}")
     print(f"   ✅ Passed: {passed}")
     print(f"   ❌ Vulnerabilities detected: {detected}")
-
-                 
-print(f"   ⏱️  Min duration: {min_dur:.3f}s")
+    print(f"   ⏱️  Min duration: {min_dur:.3f}s")
     print(f"   ⏱️  Max duration: {max_dur:.3f}s")
     print(f"   ⏱️  Avg duration: {avg_dur:.3f}s")
 
@@ -66,7 +64,7 @@ print(f"   ⏱️  Min duration: {min_dur:.3f}s")
     print(f"📄 Detailed report saved: {report_file}")
 
 def cmd_doctor(args):
- print("🩺 System check:")
+    print("🩺 System check:")
     print(f"🐍 Python: {sys.version.split()[0]}")
     try:
         import docker
@@ -91,13 +89,12 @@ def generate_html_report(results, title="AI-Hack-Simulation Report"):
     """Generate an HTML report with a table and a simple chart."""
     total = len(results)
     passed = sum(1 for r in results if r["status"] == "passed")
-detected = sum(1 for r in results if r["status"] == "vulnerability_detected")
+    detected = sum(1 for r in results if r["status"] == "vulnerability_detected")
     durations = [r.get("duration_seconds", 0.0) for r in results]
     min_dur = min(durations) if durations else 0
     max_dur = max(durations) if durations else 0
     avg_dur = sum(durations) / total if total else 0
 
-    # Prepare data for Chart.js
     labels = [os.path.basename(r["scenario"]) for r in results]
     duration_data = [r.get("duration_seconds", 0.0) for r in results]
     status_colors = ["#28a745" if r["status"] == "passed" else "#dc3545" for r in results]
@@ -111,7 +108,7 @@ detected = sum(1 for r in results if r["status"] == "vulnerability_detected")
     <style>
         body {{
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-   max-width: 1200px;
+            max-width: 1200px;
             margin: 40px auto;
             padding: 0 20px;
             background: #f8f9fa;
@@ -133,7 +130,7 @@ detected = sum(1 for r in results if r["status"] == "vulnerability_detected")
         .stat {{
             flex: 1;
             min-width: 120px;
-            text-align: center;
+   text-align: center;
         }}
         .stat .number {{
             font-size: 2em;
@@ -155,9 +152,7 @@ detected = sum(1 for r in results if r["status"] == "vulnerability_detected")
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin: 20px 0;
         }}
-
-
-   th, td {{
+        th, td {{
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #e9ecef;
@@ -197,7 +192,7 @@ detected = sum(1 for r in results if r["status"] == "vulnerability_detected")
     </style>
 </head>
 <body>
-    <h1>{title}</h1>
+ <h1>{title}</h1>
     <p><strong>Generated:</strong> {datetime.now().isoformat()}</p>
 
     <div class="stats">
@@ -253,7 +248,7 @@ detected = sum(1 for r in results if r["status"] == "vulnerability_detected")
         out_len = r.get("output_length", 0)
         html_content += f'''
             <tr>
-<td>{os.path.basename(r["scenario"])}</td>
+                <td>{os.path.basename(r["scenario"])}</td>
                 <td><span class="status-badge {status_class}">{icon} {status}</span></td>
                 <td>{exit_code}</td>
                 <td>{dur:.3f}</td>
@@ -319,7 +314,8 @@ def cmd_report(args):
         with open(lf, "r") as f:
             data = json.load(f)
         results.append(data)
-   os.makedirs("reports", exist_ok=True)
+
+    os.makedirs("reports", exist_ok=True)
 
     if args.format == "html":
         html_content = generate_html_report(results)
@@ -329,7 +325,6 @@ def cmd_report(args):
         print(f"🌐 HTML report saved: {report_path}")
         print("   Open it in your browser to view the interactive report.")
     else:
-        # Default: Markdown report (existing behaviour)
         total = len(results)
         durations = [r.get("duration_seconds", 0.0) for r in results]
         min_dur = min(durations) if durations else 0
