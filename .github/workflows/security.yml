@@ -112,7 +112,7 @@ jobs:
           provenance: false
 
       - name: Scan with Trivy
-        uses: aquasecurity/trivy-action@0.19.0   # pin to stable version
+        uses: aquasecurity/trivy-action@0.35.0   # pin to stable version
         with:
           image-ref: ai-hack-simulator:security-scan
           format: sarif
@@ -147,3 +147,7 @@ jobs:
 
       - name: Lint with pylint
         run: pylint src/ examples/ --fail-under=8.0  # adjust threshold
+
+
+
+
