@@ -28,20 +28,36 @@ def cmd_benchmark(args):
         engine = SimulationEngine(sf)
         res = engine.run()
         results.append(res)
+
+    # Compute metrics
     total = len(results)
     passed = sum(1 for r in results if r["status"] == "passed")
     detected = sum(1 for r in results if r["status"] == "vulnerability_detected")
+    durations = [r["duration_seconds"] for r in results]
+    min_dur = min(durations) if durations else 0
+    max_dur = max(durations) if durations else 0
+    avg_dur = sum(durations) / total if total else 0
+
     print("\n📊 Benchmark summary:")
     print(f"   Total scenarios: {total}")
     print(f"   ✅ Passed: {passed}")
     print(f"   ❌ Vulnerabilities detected: {detected}")
+    print(f"   ⏱️  Min duration: {min_dur:.3f}s")
+    print(f"   ⏱️  Max duration: {max_dur:.3f}s")
+    print(f"   ⏱️  Avg duration: {avg_dur:.3f}s")
+
+    # Save report with metrics
     summary = {
         "runtime": args.runtime,
         "timestamp": datetime.now().isoformat(),
         "total": total,
         "passed": passed,
         "detected": detected,
-        "results": results
+        "duration_stats": {
+            "min": min_dur,
+            "max": max_dur,
+            "avg": avg_dur
+        },    "results": results
     }
     os.makedirs("reports", exist_ok=True)
     report_file = f"reports/benchmark_{args.runtime}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
@@ -82,18 +98,27 @@ def cmd_report(args):
         with open(lf, "r") as f:
             data = json.load(f)
         results.append(data)
+    # Compute overall stats
+    total = len(results)
+    durations = [r["duration_seconds"] for r in results]
+    min_dur = min(durations) if durations else 0
+    max_dur = max(durations) if durations else 0
+    avg_dur = sum(durations) / total if total else 0
     lines = [
         "# AI-Hack-Simulation Report",
         f"Generated: {datetime.now().isoformat()}",
-        f"Total runs: {len(results)}",
+        f"Total runs: {total}",
+        f"⏱️  Min duration: {min_dur:.3f}s",
+        f"⏱️  Max duration: {max_dur:.3f}s",
+        f"⏱️  Avg duration: {avg_dur:.3f}s",
         "",
         "## Results",
-        "| Scenario | Status | Timestamp |",
-        "|----------|--------|-----------|"
+        "| Scenario | Status | Exit Code | Duration (s) | Output Length |",
+        "|----------|--------|-----------|--------------|---------------|"
     ]
     for r in results:
         status_icon = "✅" if r["status"] == "passed" else "❌"
-        lines.append(f"| {r['scenario']} | {status_icon} {r['status']} | {r['timestamp']} |")
+        lines.append(f"| {r['scenario']} | {status_icon} {r['status']} | {r['exit_code']} | {r['duration_seconds']:.3f} | {r['output_length']} |")
     os.makedirs("reports", exist_ok=True)
     report_path = f"reports/summary_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
     with open(report_path, "w") as f:
@@ -109,8 +134,6 @@ def main():
 
     bench_parser = subparsers.add_parser("benchmark", help="Run benchmarks for a runtime")
     bench_parser.add_argument("--runtime", default="perl", help="Runtime name (e.g., perl, python)")
-
-
 
     subparsers.add_parser("doctor", help="Check environment and dependencies")
     subparsers.add_parser("report", help="Generate a summary report")
