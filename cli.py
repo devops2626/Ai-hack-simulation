@@ -463,31 +463,65 @@ def cmd_analyze(args):
         print(f"   - Command: {data.get('command', 'None')}")
         print(f"   - Recommendations: Ensure the command is sandboxed and uses least privilege.")
 
+def cmd_share(args):
+    import requests
+    report_files = glob.glob("reports/benchmark_*.json")
+    if not report_files:
+        print("❌ No benchmark reports found. Run a benchmark first.")
+        return
+    latest = max(report_files, key=os.path.getctime)
+    print(f"📤 Sharing: {latest}")
+    with open(latest, "r") as f:
+        data = f.read()
+    try:
+        resp = requests.post("https://0x0.st", files={"file": data})
+        if resp.status_code == 200:
+            url = resp.text.strip()
+            print(f"🔗 Shareable link: {url}")
+            print("   Copy and share with the community!")
+        else:
+            print(f"❌ Upload failed (status {resp.status_code})")
+    except Exception as e:
+        print(f"❌ Upload error: {e}")
+
+def cmd_sync(args):
+    import subprocess
+    repo = args.repo or "https://github.com/devops2626/ai-hack-scenarios"
+    target = "community_scenarios"
+    if not os.path.isdir(target):
+        print(f"📥 Cloning community scenarios from {repo} ...")
+        subprocess.run(["git", "clone", repo, target], check=True)
+    else:
+        print("🔄 Pulling latest scenarios ...")
+        subprocess.run(["git", "-C", target, "pull"], check=True)
+    print(f"✅ Scenarios synced to ./{target}/")
+
 def main():
     parser = argparse.ArgumentParser(prog="ai-hack-simulation")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose debug logging")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     run_parser = subparsers.add_parser("run", help="Run a simulation scenario")
-    run_parser.add_argument("--verbose", action="store_true", help=argparse.SUPPRESS)
     run_parser.add_argument("scenario", help="Path to scenario YAML file")
 
     bench_parser = subparsers.add_parser("benchmark", help="Run benchmarks for a runtime")
-    bench_parser.add_argument("--verbose", action="store_true", help=argparse.SUPPRESS)
     bench_parser.add_argument("--runtime", default="perl", help="Runtime name (e.g., perl, python)")
     bench_parser.add_argument("--parallel", action="store_true", help="Run scenarios in parallel")
     bench_parser.add_argument("--workers", type=int, default=None, help="Number of parallel workers (default: CPU count)")
 
     report_parser = subparsers.add_parser("report", help="Generate a summary report")
-    report_parser.add_argument("--verbose", action="store_true", help=argparse.SUPPRESS)
     report_parser.add_argument("--format", choices=["markdown", "html"], default="html", help="Output format")
     report_parser.add_argument("--no-open", action="store_true", help="Do not automatically open HTML report in browser")
 
     analyze_parser = subparsers.add_parser("analyze", help="Analyze a scenario or log using Gemini AI")
-    analyze_parser.add_argument("--verbose", action="store_true", help=argparse.SUPPRESS)
     analyze_parser.add_argument("input", help="Path to scenario YAML or log JSON file")
 
     subparsers.add_parser("doctor", help="Check environment and dependencies")
+
+    # Community features
+    share_parser = subparsers.add_parser("share", help="Upload benchmark report to community pastebin")
+    sync_parser = subparsers.add_parser("sync", help="Pull community scenarios from a Git repo")
+    sync_parser.add_argument("--repo", default="https://github.com/devops2626/ai-hack-scenarios", help="Git repository URL")
 
     args = parser.parse_args()
 
@@ -501,6 +535,10 @@ def main():
         cmd_analyze(args)
     elif args.command == "doctor":
         cmd_doctor(args)
+    elif args.command == "share":
+        cmd_share(args)
+    elif args.command == "sync":
+        cmd_sync(args)
 
 if __name__ == "__main__":
     main()
