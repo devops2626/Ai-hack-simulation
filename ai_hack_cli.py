@@ -80,6 +80,12 @@ def main_loop():
         print("=" * 45)
         
         username = input("\n👤 Enter your agent codename: ").strip() or "Agent-X"
+
+        # --- JARVIS EASTER EGG ---
+        if username.lower() == "jarvis":
+            print("\n🤖 \"Welcome back, sir. I have already analyzed the threat matrix and pre-calculated the optimal infiltration route.\"")
+            print("\033[92m\033[1mVOICE MODE: JARVIS ACTIVATED\033[0m")
+        # -------------------------
         
         print("\n📋 Select your speciality (Hobby Template):")
         for t in templates:
