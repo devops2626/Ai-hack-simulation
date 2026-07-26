@@ -86,6 +86,21 @@ def print_leaderboard():
         print(f"{idx}. {agent} — {missions} mission{'s' if missions != 1 else ''}")
     print("=" * 45)
 
+# --- JARVIS PREDICTIVE RECOMMENDATION ENGINE ---
+def get_recommendation(username, templates):
+    if not os.path.exists(SESSION_LOG_FILE):
+        return None
+    with open(SESSION_LOG_FILE, 'r') as f:
+        sessions = [json.loads(line) for line in f if line.strip()]
+    user_sessions = [s for s in sessions if s['username'].lower() == username.lower()]
+    last_hobbies = [s['hobby_name'] for s in user_sessions[-3:]]
+    if not last_hobbies:
+        return None
+    from collections import Counter
+    mode_hobby = Counter(last_hobbies).most_common(1)[0][0]
+    return next((t for t in templates if t['name'] == mode_hobby), None)
+# ---------------------------------------------
+
 # --- JARVIS COMMAND CENTER (Integrated) ---
 def handle_jarvis_command(cmd):
     parts = cmd.strip().split()
@@ -144,7 +159,13 @@ def main_loop():
             print("\n🤖 \"Welcome back, sir. I have already analyzed the threat matrix and pre-calculated the optimal infiltration route.\"")
             print("\033[92m\033[1mVOICE MODE: JARVIS ACTIVATED\033[0m")
         # ------------------------------------------
-        
+
+        # --- JARVIS PREDICTIVE RECOMMENDATION ---
+        rec = get_recommendation(username, templates)
+        if rec:
+            print(f"\n🤖 Based on your last 3 missions, I recommend the '{rec['name']}' speciality, sir.")
+        # ------------------------------------------
+
         print("\n📋 Select your speciality (Hobby Template):")
         for t in templates:
             print(f"  {t['id']}. {t['name']}")
