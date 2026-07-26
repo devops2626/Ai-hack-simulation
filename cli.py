@@ -364,6 +364,9 @@ def main():
     report_parser = subparsers.add_parser("report", help="Generate a summary report")
     report_parser.add_argument("--format", choices=["markdown", "html"], default="markdown", help="Output format")
 
+    analyze_parser = subparsers.add_parser("analyze", help="Analyze a scenario or log using Gemini AI")
+    analyze_parser.add_argument("input", help="Path to scenario YAML or log JSON file")
+
     subparsers.add_parser("doctor", help="Check environment and dependencies")
 
     args = parser.parse_args()
@@ -374,6 +377,8 @@ def main():
         cmd_benchmark(args)
     elif args.command == "report":
         cmd_report(args)
+    elif args.command == "analyze":
+        cmd_analyze(args)
     elif args.command == "doctor":
         cmd_doctor(args)
 

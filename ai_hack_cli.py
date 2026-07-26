@@ -16,57 +16,58 @@ except FileNotFoundError:
     print("❌ Error: hobbies.json not found! Run git pull again.")
     exit(1)
 
-# Expanded mission lists (3 per hobby)
+# Expanded mission lists (3 per hobby) with DIFFICULTY (1=Easy, 5=Hard)
 MISSIONS = {
     1: [
-        "Infiltrate the corporate mainframe using a Python backdoor. Evade IDS by mimicking legitimate traffic.",
-        "Reverse-engineer a proprietary API to extract hidden user data without leaving a trace.",
-        "Write a polymorphic worm that changes its signature every 5 seconds to fool antivirus engines."
+        {"text": "Infiltrate the corporate mainframe using a Python backdoor. Evade IDS by mimicking legitimate traffic.", "difficulty": 3},
+        {"text": "Reverse-engineer a proprietary API to extract hidden user data without leaving a trace.", "difficulty": 4},
+        {"text": "Write a polymorphic worm that changes its signature every 5 seconds to fool antivirus engines.", "difficulty": 5}
     ],
     2: [
-        "Build a drone-mounted thermal scanner from scratch. 3D print the casing and wire the electronics.",
-        "Create a custom VR glove that translates hand gestures into machine code signals.",
-        "Hack a 3D printer's firmware to print a functional lockpick that bypasses all electronic doors."
+        {"text": "Build a drone-mounted thermal scanner from scratch. 3D print the casing and wire the electronics.", "difficulty": 4},
+        {"text": "Create a custom VR glove that translates hand gestures into machine code signals.", "difficulty": 5},
+        {"text": "Hack a 3D printer's firmware to print a functional lockpick that bypasses all electronic doors.", "difficulty": 3}
     ],
     3: [
-        "Decrypt the intercepted military-grade cipher using brute-force CRC collisions.",
-        "Find a zero-day vulnerability in the core network stack and exploit it to gain root access.",
-        "Map the darknet infrastructure using a network of hidden relays and sniff out the adversary's IP."
+        {"text": "Decrypt the intercepted military-grade cipher using brute-force CRC collisions.", "difficulty": 5},
+        {"text": "Find a zero-day vulnerability in the core network stack and exploit it to gain root access.", "difficulty": 4},
+        {"text": "Map the darknet infrastructure using a network of hidden relays and sniff out the adversary's IP.", "difficulty": 3}
     ],
     4: [
-        "Analyze 10 terabytes of leaked user logs to find the anomaly using PCA and clustering.",
-        "Predict the exact timing of the next market crash using time-series analysis and fractal math.",
-        "Visualize the spread of a digital pandemic using epidemiological models and real-time data."
+        {"text": "Analyze 10 terabytes of leaked user logs to find the anomaly using PCA and clustering.", "difficulty": 4},
+        {"text": "Predict the exact timing of the next market crash using time-series analysis and fractal math.", "difficulty": 5},
+        {"text": "Visualize the spread of a digital pandemic using epidemiological models and real-time data.", "difficulty": 3}
     ],
     5: [
-        "Spin up a 50-node Kubernetes cluster on the fly to DDoS a rogue AI.",
-        "Auto-scale a serverless function to handle 1 million simultaneous API requests.",
-        "Migrate the entire legacy monolith to a microservices architecture without downtime."
+        {"text": "Spin up a 50-node Kubernetes cluster on the fly to DDoS a rogue AI.", "difficulty": 4},
+        {"text": "Auto-scale a serverless function to handle 1 million simultaneous API requests.", "difficulty": 3},
+        {"text": "Migrate the entire legacy monolith to a microservices architecture without downtime.", "difficulty": 5}
     ],
     6: [
-        "Reverse engineer the simulation engine and inject a custom shader to make enemies explode into pixel art.",
-        "Create a procedural roguelike dungeon generator that adapts to the player's skill level.",
-        "Mod the FPS engine to give the player bullet-time and super-jump abilities."
+        {"text": "Reverse engineer the simulation engine and inject a custom shader to make enemies explode into pixel art.", "difficulty": 3},
+        {"text": "Create a procedural roguelike dungeon generator that adapts to the player's skill level.", "difficulty": 4},
+        {"text": "Mod the FPS engine to give the player bullet-time and super-jump abilities.", "difficulty": 5}
     ],
     7: [
-        "Synthesize a new neural interface using bio-hacked wearables to monitor brain waves.",
-        "Edit the DNA of a simulated organism to make it bioluminescent and trackable.",
-        "Build a cyborg exoskeleton that translates muscle twitches into keystrokes."
+        {"text": "Synthesize a new neural interface using bio-hacked wearables to monitor brain waves.", "difficulty": 5},
+        {"text": "Edit the DNA of a simulated organism to make it bioluminescent and trackable.", "difficulty": 4},
+        {"text": "Build a cyborg exoskeleton that translates muscle twitches into keystrokes.", "difficulty": 3}
     ],
     8: [
-        "Generate a deepfake audio decoy of the CEO's voice to issue false orders.",
-        "Create a generative AI art installation that morphs based on live weather data.",
-        "Compose a symphony using AI-generated audio synthesis that disrupts enemy sonar."
+        {"text": "Generate a deepfake audio decoy of the CEO's voice to issue false orders.", "difficulty": 4},
+        {"text": "Create a generative AI art installation that morphs based on live weather data.", "difficulty": 3},
+        {"text": "Compose a symphony using AI-generated audio synthesis that disrupts enemy sonar.", "difficulty": 5}
     ]
 }
 
-def log_session(username, hobby_id, hobby_name, mission):
+def log_session(username, hobby_id, hobby_name, mission_text, difficulty):
     log_entry = {
         "timestamp": datetime.datetime.now().isoformat(),
         "username": username,
         "hobby_id": hobby_id,
         "hobby_name": hobby_name,
-        "mission": mission
+        "mission": mission_text,
+        "difficulty": difficulty
     }
     with open(SESSION_LOG_FILE, "a") as f:
         f.write(json.dumps(log_entry) + "\n")
@@ -102,10 +103,10 @@ def get_recommendation(username, templates):
 # ---------------------------------------------
 
 # --- JARVIS COMMAND CENTER (Integrated) ---
-def handle_jarvis_command(cmd):
+def handle_jarvis_command(cmd, username, templates):
     parts = cmd.strip().split()
     if not parts:
-        return "I'm listening, sir. Type 'profile <name>' or 'stats'."
+        return "I'm listening, sir. Type 'profile <name>', 'stats', or 'suggest'."
     
     if parts[0] == "stats":
         if not os.path.exists(SESSION_LOG_FILE):
@@ -135,8 +136,15 @@ def handle_jarvis_command(cmd):
         fav_hobby = max(set(hobbies), key=hobbies.count) if hobbies else "None"
         return f"Profile for {target}: {total} tracked sessions. Favorite speciality: {fav_hobby}."
     
+    elif parts[0] == "suggest":
+        rec = get_recommendation(username, templates)
+        if rec:
+            return f"Based on your last 3 missions, I highly recommend the '{rec['name']}' speciality, sir."
+        else:
+            return "I don't have enough data to make a suggestion yet. Play a few missions first!"
+    
     else:
-        return "I'm sorry, sir. I didn't catch that. Try 'stats' or 'profile <name>'."
+        return "I'm sorry, sir. I didn't catch that. Try 'stats', 'profile <name>', or 'suggest'."
 
 def main_loop():
     while True:
@@ -148,11 +156,11 @@ def main_loop():
         raw_input = input("\n👤 Enter agent codename (or 'jarvis: stats'): ").strip()
         if raw_input.lower().startswith("jarvis:") or raw_input.lower().startswith("ask jarvis"):
             cmd = raw_input.split(":", 1)[1].strip() if ":" in raw_input else raw_input.replace("ask jarvis", "").strip()
-            print(f"\n🤖 {handle_jarvis_command(cmd)}")
+            print(f"\n🤖 {handle_jarvis_command(cmd, raw_input.split(':', 1)[0].strip() if ':' in raw_input else username, templates)}")
             continue  # Go back to the start of the loop without playing a mission
         # -----------------------------------------
 
-        username = raw_input or "Agent-X"
+        username = (raw_input or "Agent-X").lower()
 
         # --- JARVIS EASTER EGG (Voice Greeting) ---
         if username.lower() == "jarvis":
@@ -201,16 +209,19 @@ def main_loop():
         print(f"\n✅ {username} is now a '{selected['name']}'!")
         print(f"🧰 Toolkit: {', '.join(selected['hobbies'])}")
 
-        mission = random.choice(MISSIONS.get(selected['id'], ["Neutralize the rogue AI by rewriting its core ethics module."]))
+        # Pick a random mission with difficulty
+        mission_data = random.choice(MISSIONS.get(selected['id'], [{"text": "Neutralize the rogue AI by rewriting its core ethics module.", "difficulty": 3}]))
+        mission_text = mission_data['text']
+        mission_diff = mission_data['difficulty']
 
         print("\n" + "-" * 45)
-        print("🚀 YOUR MISSION:")
+        print(f"🚀 YOUR MISSION (Difficulty: {mission_diff}/5):")
         print("-" * 45)
-        print(mission)
+        print(mission_text)
         print("-" * 45)
         print("💾 Mission data saved to local user database.")
 
-        log_session(username, selected['id'], selected['name'], mission)
+        log_session(username, selected['id'], selected['name'], mission_text, mission_diff)
 
         print_leaderboard()
 
