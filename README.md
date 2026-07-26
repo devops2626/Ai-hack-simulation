@@ -45,3 +45,8 @@ No JIT required — this script runs fast on pure Python.
 ---
 
 Built with ❤️ by devops2626
+
+
+## 🎙️ Easter Egg: Jarvis Voice
+Type **`Jarvis`** as your agent codename to unlock a special voice greeting. 
+The AI will acknowledge your presence and activate **VOICE MODE**, giving you a tactical analysis before the mission begins. 
