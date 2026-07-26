@@ -1,9 +1,11 @@
 import json
 import random
 import os
+import datetime
 
 HOBBY_FILE = 'hobbies.json'
 USER_FILE = 'users.json'
+SESSION_LOG_FILE = 'session_logs.jsonl'
 
 # Load hobbies
 try:
@@ -58,6 +60,17 @@ MISSIONS = {
     ]
 }
 
+def log_session(username, hobby_id, hobby_name, mission):
+    log_entry = {
+        "timestamp": datetime.datetime.now().isoformat(),
+        "username": username,
+        "hobby_id": hobby_id,
+        "hobby_name": hobby_name,
+        "mission": mission
+    }
+    with open(SESSION_LOG_FILE, "a") as f:
+        f.write(json.dumps(log_entry) + "\n")
+
 def print_leaderboard():
     print("\n" + "=" * 45)
     print("🏆 AGENT LEADERBOARD 🏆")
@@ -73,19 +86,64 @@ def print_leaderboard():
         print(f"{idx}. {agent} — {missions} mission{'s' if missions != 1 else ''}")
     print("=" * 45)
 
+# --- JARVIS COMMAND CENTER (Integrated) ---
+def handle_jarvis_command(cmd):
+    parts = cmd.strip().split()
+    if not parts:
+        return "I'm listening, sir. Type 'profile <name>' or 'stats'."
+    
+    if parts[0] == "stats":
+        if not os.path.exists(SESSION_LOG_FILE):
+            return "No mission logs found yet, sir. Run a simulation first."
+        with open(SESSION_LOG_FILE, 'r') as f:
+            lines = [line for line in f if line.strip()]
+        agents = set()
+        for line in lines:
+            try:
+                data = json.loads(line)
+                agents.add(data['username'])
+            except:
+                pass
+        return f"System Report: {len(lines)} total missions logged across {len(agents)} active agents. Roster: {', '.join(agents)}"
+    
+    elif parts[0] == "profile" and len(parts) > 1:
+        target = parts[1]
+        if not os.path.exists(SESSION_LOG_FILE):
+            return f"I have no data on {target}, sir."
+        with open(SESSION_LOG_FILE, 'r') as f:
+            sessions = [json.loads(line) for line in f if line.strip()]
+        user_sessions = [s for s in sessions if s['username'].lower() == target.lower()]
+        if not user_sessions:
+            return f"I have no data on {target}, sir."
+        total = len(user_sessions)
+        hobbies = [s['hobby_name'] for s in user_sessions]
+        fav_hobby = max(set(hobbies), key=hobbies.count) if hobbies else "None"
+        return f"Profile for {target}: {total} tracked sessions. Favorite speciality: {fav_hobby}."
+    
+    else:
+        return "I'm sorry, sir. I didn't catch that. Try 'stats' or 'profile <name>'."
+
 def main_loop():
     while True:
         print("\n" + "=" * 45)
         print("   🤖 AI HACK SIMULATION v2.0   ")
         print("=" * 45)
         
-        username = input("\n👤 Enter your agent codename: ").strip() or "Agent-X"
+        # --- INTEGRATED JARVIS COMMAND PROMPT ---
+        raw_input = input("\n👤 Enter agent codename (or 'jarvis: stats'): ").strip()
+        if raw_input.lower().startswith("jarvis:") or raw_input.lower().startswith("ask jarvis"):
+            cmd = raw_input.split(":", 1)[1].strip() if ":" in raw_input else raw_input.replace("ask jarvis", "").strip()
+            print(f"\n🤖 {handle_jarvis_command(cmd)}")
+            continue  # Go back to the start of the loop without playing a mission
+        # -----------------------------------------
 
-        # --- JARVIS EASTER EGG ---
+        username = raw_input or "Agent-X"
+
+        # --- JARVIS EASTER EGG (Voice Greeting) ---
         if username.lower() == "jarvis":
             print("\n🤖 \"Welcome back, sir. I have already analyzed the threat matrix and pre-calculated the optimal infiltration route.\"")
             print("\033[92m\033[1mVOICE MODE: JARVIS ACTIVATED\033[0m")
-        # -------------------------
+        # ------------------------------------------
         
         print("\n📋 Select your speciality (Hobby Template):")
         for t in templates:
@@ -111,7 +169,7 @@ def main_loop():
         if username not in users:
             users[username] = {'hobbies': selected['hobbies'], 'missions_completed': 0}
         else:
-            users[username]['hobbies'] = selected['hobbies']  # update hobby if changed
+            users[username]['hobbies'] = selected['hobbies']
         
         # Increment mission count
         users[username]['missions_completed'] = users[username].get('missions_completed', 0) + 1
@@ -122,7 +180,6 @@ def main_loop():
         print(f"\n✅ {username} is now a '{selected['name']}'!")
         print(f"🧰 Toolkit: {', '.join(selected['hobbies'])}")
 
-        # Pick a random mission from the expanded list
         mission = random.choice(MISSIONS.get(selected['id'], ["Neutralize the rogue AI by rewriting its core ethics module."]))
 
         print("\n" + "-" * 45)
@@ -132,10 +189,10 @@ def main_loop():
         print("-" * 45)
         print("💾 Mission data saved to local user database.")
 
-        # Show updated leaderboard
+        log_session(username, selected['id'], selected['name'], mission)
+
         print_leaderboard()
 
-        # Replay loop
         again = input("\n🔄 Play again? (y/n): ").strip().lower()
         if again != 'y':
             print("\n👋 Exiting the simulation. See you next time, agent!")
