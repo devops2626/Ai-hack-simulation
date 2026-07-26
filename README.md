@@ -1,32 +1,47 @@
-# 🤖 AI Hacking Simulator (Educational)
+# 🤖 AI Hack Simulation
 
-> **⚠️ WARNING:** This project is for **educational and defensive security research only.**  
-> Do not use against any system without explicit written permission.
+A lightweight, interactive CLI game built in Python that runs perfectly on iSH (Alpine Linux). 
+Choose your hacker specialty, receive a unique random mission, and track your agent's stats on the leaderboard!
 
-**Author:** Barki Mustapha (devops2626) — Engineering Automation  
-**Email:** devops26@icloud.com  
-**LinkedIn:** [Barki Mustapha](https://www.linkedin.com/in/start-export/)  
-**GitHub:** [devops2626](https://github.com/devops2626)
-[![CodeQL](https://github.com/devops2626/Ai-hack-simulation/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/devops2626/Ai-hack-simulation/security/code-scanning)
-This is a **sandboxed simulation** of the OpenAI vs Hugging Face incident (July 2026), showing how an AI agent chains zero‑days.
+## 🚀 Quick Start
 
-## Quick Commands
-- `make install` – install dependencies  
-- `make run-agent` – watch the AI reason  
-- `make run-server` – start the mock vulnerable Flask server  
-- `make run-payload` – fire the simulated exploit  
+Make sure you have Python 3 installed:
+```bash
+apk add python3
+```
 
-See [docs/attack_flow.md](docs/attack_flow.md) for the technical walkthrough.
+Run the game:
 
-## SAST Tools Comparison
+```bash
+python3 ai_hack_cli.py
+```
 
-| Tool          | Speed     | Depth          | Best For                          | In Project? | Custom Rules |
-|---------------|-----------|----------------|-----------------------------------|-------------|--------------|
-| **Semgrep**   | Very Fast | Good           | Custom rules, Flask/SSTI          | Yes        | Excellent   |
-| **CodeQL**    | Medium    | Excellent      | Semantic analysis                 | Yes        | Good        |
-| **Bandit**    | Fast      | Good           | Python-specific security          | Ready      | Good        |
-| **Trivy**     | Fast      | Good           | Container scanning                | Yes        | Limited     |
+Or use the shortcut:
 
-## License: MIT
+```bash
+make start
+```
 
-Powered by **Grok** (built by xAI)
+🎮 Features
+
+· 8 unique hacker specialties (from Tech Enthusiast to AI Artist)
+· Dynamic mission generator with 3 random scenarios per specialty
+· Persistent user database (users.json) tracking mission counts
+· Built-in leaderboard to rank agents
+
+📂 File Structure
+
+· ai_hack_cli.py – Main game logic
+· hobbies.json – Template definitions
+· hobby_manager.py – Standalone backend helper
+· Makefile – Launch shortcut
+· users.json – Local user stats (gitignored)
+
+🐧 Running on iSH (iPhone)
+
+Since iSH uses Alpine Linux, packages are installed via apk.
+No JIT required — this script runs fast on pure Python.
+
+---
+
+Built with ❤️ by devops2626
