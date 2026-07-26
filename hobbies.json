@@ -1,0 +1,19 @@
+{
+  "templates": [
+    {
+      "id": 1,
+      "name": "Tech Enthusiast",
+      "hobbies": ["Coding", "Hackathons", "AI Research", "Open Source"]
+    },
+    {
+      "id": 2,
+      "name": "Creative Maker",
+      "hobbies": ["3D Printing", "Electronics", "DIY Robotics", "Woodworking"]
+    },
+    {
+      "id": 3,
+      "name": "Cyber Explorer",
+      "hobbies": ["CTF Challenges", "Network Security", "Cryptography", "Pen Testing"]
+    }
+  ]
+}
