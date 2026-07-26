@@ -5,6 +5,14 @@ import json
 from datetime import datetime
 from engine import SimulationEngine
 import glob
+import concurrent.futures
+import time
+
+def run_scenario(scenario_file):
+    """Helper to run a single scenario and return the result dict."""
+    print(f"▶️  Running {scenario_file}")
+    engine = SimulationEngine(scenario_file)
+    return engine.run()
 
 def cmd_run(args):
     engine = SimulationEngine(args.scenario)
@@ -21,13 +29,27 @@ def cmd_benchmark(args):
         print(f"ℹ️  No YAML scenarios found in {runtime_dir}")
         return
     print(f"📂 Found {len(scenario_files)} scenario(s)")
-    results = []
-    for sf in scenario_files:
-        print(f"\n▶️  Running {sf}")
-        engine = SimulationEngine(sf)
-        res = engine.run()
-        results.append(res)
 
+    start_all = time.time()
+    results = []
+    if args.parallel:
+        max_workers = args.workers or os.cpu_count() or 4
+        print(f"⚡ Running with {max_workers} parallel workers")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_scenario = {executor.submit(run_scenario, sf): sf for sf in scenario_files}
+            for future in concurrent.futures.as_completed(future_to_scenario):
+                sf = future_to_scenario[future]
+                try:
+                    res = future.result()
+                    results.append(res)
+                except Exception as e:
+                    print(f"❌ Scenario {sf} failed: {e}")
+    else:
+        print("🐢 Running sequentially")
+        for sf in scenario_files:
+            results.append(run_scenario(sf))
+
+    total_duration = time.time() - start_all
     total = len(results)
     passed = sum(1 for r in results if r["status"] == "passed")
     detected = sum(1 for r in results if r["status"] == "vulnerability_detected")
@@ -43,6 +65,7 @@ def cmd_benchmark(args):
     print(f"   ⏱️  Min duration: {min_dur:.3f}s")
     print(f"   ⏱️  Max duration: {max_dur:.3f}s")
     print(f"   ⏱️  Avg duration: {avg_dur:.3f}s")
+    print(f"   ⏱️  Total wall-clock time: {total_duration:.2f}s")
 
     summary = {
         "runtime": args.runtime,
@@ -55,6 +78,7 @@ def cmd_benchmark(args):
             "max": max_dur,
             "avg": avg_dur
         },
+        "total_wall_time": total_duration,
         "results": results
     }
     os.makedirs("reports", exist_ok=True)
@@ -130,7 +154,7 @@ def generate_html_report(results, title="AI-Hack-Simulation Report"):
         .stat {{
             flex: 1;
             min-width: 120px;
-   text-align: center;
+            text-align: center;
         }}
         .stat .number {{
             font-size: 2em;
@@ -192,7 +216,7 @@ def generate_html_report(results, title="AI-Hack-Simulation Report"):
     </style>
 </head>
 <body>
- <h1>{title}</h1>
+    <h1>{title}</h1>
     <p><strong>Generated:</strong> {datetime.now().isoformat()}</p>
 
     <div class="stats">
@@ -351,6 +375,51 @@ def cmd_report(args):
             f.write("\n".join(lines))
         print(f"📄 Markdown report saved: {report_path}")
 
+def cmd_analyze(args):
+    """Analyze a scenario or log file using Gemini API (fallback to local mock)."""
+    import requests
+    # 1. Read input
+    if args.input.endswith((".yml", ".yaml")):
+        with open(args.input, "r") as f:
+            import yaml
+            data = yaml.safe_load(f)
+            prompt = f"Analyze this security scenario:\nName: {data.get('name', 'Unnamed')}\nCommand: {data.get('command', 'None')}\nExpected failure: {data.get('expected_failure_detection', 'None')}\nProvide a risk assessment and suggest improvements."
+    else:
+        with open(args.input, "r") as f:
+            data = json.load(f)
+            prompt = f"Analyze this simulation result:\nScenario: {data.get('scenario', 'Unknown')}\nStatus: {data.get('status', 'Unknown')}\nOutput: {data.get('output', '')[:500]}\nProvide a summary and recommendations."
+
+    # 2. Try Gemini API
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if api_key:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+        payload = {"contents": [{"parts": [{"text": prompt}]}]}
+        try:
+            resp = requests.post(url, json=payload, timeout=30)
+            resp.raise_for_status()
+            result = resp.json()
+            text = result.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+            print("🤖 Gemini Analysis:")
+            print(text)
+            return
+        except Exception as e:
+            print(f"⚠️  Gemini API error: {e}")
+            # Fall through
+    else:
+        print("ℹ️  GEMINI_API_KEY not set. Using local mock analysis.")
+
+    # 3. Local mock fallback
+    print("🔧 Local mock analysis:")
+    if "scenario" in data:  # it's a log
+        print(f"   - Scenario: {data.get('scenario')}")
+        print(f"   - Status: {data.get('status')}")
+        print(f"   - Duration: {data.get('duration_seconds', 0):.2f}s")
+        print(f"   - Recommendations: Review the command for privilege escalation risks.")
+    else:
+        print(f"   - Scenario: {data.get('name', 'Unnamed')}")
+        print(f"   - Command: {data.get('command', 'None')}")
+        print(f"   - Recommendations: Ensure the command is sandboxed and uses least privilege.")
+
 def main():
     parser = argparse.ArgumentParser(prog="ai-hack-simulation")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -360,6 +429,8 @@ def main():
 
     bench_parser = subparsers.add_parser("benchmark", help="Run benchmarks for a runtime")
     bench_parser.add_argument("--runtime", default="perl", help="Runtime name (e.g., perl, python)")
+    bench_parser.add_argument("--parallel", action="store_true", help="Run scenarios in parallel")
+    bench_parser.add_argument("--workers", type=int, default=None, help="Number of parallel workers (default: CPU count)")
 
     report_parser = subparsers.add_parser("report", help="Generate a summary report")
     report_parser.add_argument("--format", choices=["markdown", "html"], default="markdown", help="Output format")
