@@ -16,3 +16,7 @@ docker-compose-down:
 	docker compose down
 clean:
 	find . -name "__pycache__" -delete
+start:
+python3 ai_hack_cli.py
+start:
+python3 ai_hack_cli.py
