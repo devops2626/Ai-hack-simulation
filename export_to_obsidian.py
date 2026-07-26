@@ -1,30 +1,77 @@
 import json
 import os
+from collections import Counter
 
+SESSION_LOG_FILE = 'session_logs.jsonl'
 USER_FILE = 'users.json'
+OUTPUT_FILE = 'obsidian_report.md'
 
-if not os.path.exists(USER_FILE):
-    print("No user data found. Run the simulation first!")
-    exit(1)
+def load_sessions():
+    if not os.path.exists(SESSION_LOG_FILE):
+        return []
+    with open(SESSION_LOG_FILE, 'r') as f:
+        return [json.loads(line) for line in f if line.strip()]
 
-with open(USER_FILE, 'r') as f:
-    users = json.load(f)
+def generate_report():
+    sessions = load_sessions()
+    if not sessions:
+        print("No sessions found. Run the simulation first!")
+        return
 
-# Sort by missions completed
-sorted_agents = sorted(users.items(), key=lambda x: x[1].get('missions_completed', 0), reverse=True)
+    md = []
+    md.append("# 🧠 Jarvis Mission Intelligence Report\n")
+    # Use a safe timestamp
+    md.append(f"*Generated on: {os.popen('date').read().strip()}*\n")
+    md.append(f"**Total Missions Logged:** {len(sessions)}\n")
 
-# Generate Markdown content
-md_content = "# 🏆 AI Hack Leaderboard\n\n"
-md_content += "| Rank | Agent | Missions | Hobby |\n"
-md_content += "|------|-------|----------|-------|\n"
+    # Group by agent
+    agents = {}
+    for s in sessions:
+        name = s.get('username', 'Unknown')
+        if name not in agents:
+            agents[name] = []
+        agents[name].append(s)
 
-for idx, (agent, stats) in enumerate(sorted_agents, 1):
-    hobby = ", ".join(stats.get('hobbies', ['Unknown']))
-    missions = stats.get('missions_completed', 0)
-    md_content += f"| {idx} | **{agent}** | {missions} | {hobby} |\n"
+    md.append("## 📊 Agent Performance Dashboard\n")
+    for agent, missions in agents.items():
+        md.append(f"### Agent: **{agent}**")
+        md.append(f"- **Total Missions:** {len(missions)}")
+        
+        # Calculate average difficulty, default to 3 if missing
+        difficulties = [m.get('difficulty', 3) for m in missions]
+        avg_diff = sum(difficulties) / len(difficulties)
+        md.append(f"- **Average Mission Difficulty:** {avg_diff:.1f}/5")
+        
+        # Favorite hobby
+        hobbies = [m.get('hobby_name', 'Unknown') for m in missions]
+        fav_hobby = Counter(hobbies).most_common(1)[0][0] if hobbies else 'None'
+        md.append(f"- **Favorite Speciality:** {fav_hobby}")
+        md.append("")
+        
+        md.append("| Date | Speciality | Mission | Difficulty |")
+        md.append("|------|------------|---------|------------|")
+        for m in missions:
+            date = m.get('timestamp', 'Unknown')[:10] if 'timestamp' in m else 'Unknown'
+            hobby = m.get('hobby_name', 'Unknown')
+            mission = m.get('mission', 'No mission text')[:50] + '...'
+            diff = m.get('difficulty', 3)
+            diff_emoji = "⚔️" * diff
+            md.append(f"| {date} | {hobby} | {mission} | {diff_emoji} ({diff}/5) |")
+        md.append("\n---\n")
 
-# Save to file
-with open("leaderboard.md", "w") as f:
-    f.write(md_content)
+    # Global stats
+    md.append("## 🌍 Global Analytics")
+    all_diffs = [s.get('difficulty', 3) for s in sessions]
+    md.append(f"- **Hardest Mission Played:** {max(all_diffs)}/5")
+    md.append(f"- **Easiest Mission Played:** {min(all_diffs)}/5")
+    md.append(f"- **Global Average Difficulty:** {sum(all_diffs)/len(all_diffs):.1f}/5")
+    
+    # Write to file
+    with open(OUTPUT_FILE, 'w') as f:
+        f.write("\n".join(md))
+    
+    print(f"✅ {OUTPUT_FILE} created successfully!")
+    print("To import into Obsidian: copy/paste the text or use iOS Files app to share.")
 
-print("✅ leaderboard.md created successfully!")
+if __name__ == "__main__":
+    generate_report()
