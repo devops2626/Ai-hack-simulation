@@ -4,3 +4,6 @@ venv/
 *.log
 instance/
 .envusers.json
+users.json
+logs/
+reports/
