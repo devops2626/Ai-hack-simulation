@@ -91,7 +91,7 @@ def main_loop():
             if not selected:
                 raise ValueError
         except:
-           print("❌ Invalid ID. Assigning default (Tech Enthusiast).")
+            print("❌ Invalid ID. Assigning default (Tech Enthusiast).")
             selected = templates[0]
 
         # Load existing user stats
