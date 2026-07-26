@@ -7,18 +7,31 @@ from engine import SimulationEngine
 import glob
 import concurrent.futures
 import time
+import webbrowser
 
-def run_scenario(scenario_file):
+def run_scenario(scenario_file, verbose=False):
     """Helper to run a single scenario and return the result dict."""
-    print(f"▶️  Running {scenario_file}")
+    if verbose:
+        print(f"🔍 [VERBOSE] Starting scenario: {scenario_file}")
     engine = SimulationEngine(scenario_file)
-    return engine.run()
+    result = engine.run()
+    if verbose:
+        print(f"🔍 [VERBOSE] Finished scenario: {scenario_file} (status: {result['status']}, duration: {result['duration_seconds']:.3f}s)")
+    return result
 
 def cmd_run(args):
+    if args.verbose:
+        print(f"🔍 [VERBOSE] Running scenario: {args.scenario}")
     engine = SimulationEngine(args.scenario)
     engine.run()
 
 def cmd_benchmark(args):
+    if args.verbose:
+        print(f"🔍 [VERBOSE] Benchmark runtime: {args.runtime}")
+        print(f"🔍 [VERBOSE] Parallel mode: {args.parallel}")
+        if args.parallel:
+            print(f"🔍 [VERBOSE] Workers: {args.workers or os.cpu_count() or 4}")
+
     print(f"🏁 Running benchmarks for runtime: {args.runtime}")
     runtime_dir = os.path.join("library", "runtimes", args.runtime)
     if not os.path.isdir(runtime_dir):
@@ -36,7 +49,7 @@ def cmd_benchmark(args):
         max_workers = args.workers or os.cpu_count() or 4
         print(f"⚡ Running with {max_workers} parallel workers")
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-            future_to_scenario = {executor.submit(run_scenario, sf): sf for sf in scenario_files}
+            future_to_scenario = {executor.submit(run_scenario, sf, args.verbose): sf for sf in scenario_files}
             for future in concurrent.futures.as_completed(future_to_scenario):
                 sf = future_to_scenario[future]
                 try:
@@ -47,7 +60,7 @@ def cmd_benchmark(args):
     else:
         print("🐢 Running sequentially")
         for sf in scenario_files:
-            results.append(run_scenario(sf))
+            results.append(run_scenario(sf, args.verbose))
 
     total_duration = time.time() - start_all
     total = len(results)
@@ -66,6 +79,29 @@ def cmd_benchmark(args):
     print(f"   ⏱️  Max duration: {max_dur:.3f}s")
     print(f"   ⏱️  Avg duration: {avg_dur:.3f}s")
     print(f"   ⏱️  Total wall-clock time: {total_duration:.2f}s")
+
+    if args.verbose:
+        print(f"🔍 [VERBOSE] All results: {json.dumps([r['status'] for r in results])}")
+
+    summary = {
+        "runtime": args.runtime,
+        "timestamp": datetime.now().isoformat(),
+        "total": total,
+        "passed": passed,
+        "detected": detected,
+        "duration_stats": {
+            "min": min_dur,
+            "max": max_dur,
+            "avg": avg_dur
+        },
+        "total_wall_time": total_duration,
+        "results": results
+    }
+    os.makedirs("reports", exist_ok=True)
+    report_file = f"reports/benchmark_{args.runtime}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    with open(report_file, "w") as f:
+        json.dump(summary, f, indent=2)
+        print(f"p [VERBOSE] All results: {json.dumps([r['status'] for r in results])}")
 
     summary = {
         "runtime": args.runtime,
@@ -347,7 +383,12 @@ def cmd_report(args):
         with open(report_path, "w") as f:
             f.write(html_content)
         print(f"🌐 HTML report saved: {report_path}")
-        print("   Open it in your browser to view the interactive report.")
+        # Auto-open unless --no-open was given
+        if not args.no_open:
+            print("🚀 Opening report in browser...")
+            webbrowser.open(f"file://{os.path.abspath(report_path)}")
+        else:
+            print("ℹ️  Auto-open disabled (--no-open)")
     else:
         total = len(results)
         durations = [r.get("duration_seconds", 0.0) for r in results]
@@ -411,6 +452,8 @@ def cmd_analyze(args):
     # 3. Local mock fallback
     print("🔧 Local mock analysis:")
     if "scenario" in data:  # it's a log
+        print("🔧 Local mock analysis:")
+    if "scenario" in data:  # it's a log
         print(f"   - Scenario: {data.get('scenario')}")
         print(f"   - Status: {data.get('status')}")
         print(f"   - Duration: {data.get('duration_seconds', 0):.2f}s")
@@ -422,20 +465,26 @@ def cmd_analyze(args):
 
 def main():
     parser = argparse.ArgumentParser(prog="ai-hack-simulation")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose debug logging")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     run_parser = subparsers.add_parser("run", help="Run a simulation scenario")
+    run_parser.add_argument("--verbose", action="store_true", help=argparse.SUPPRESS)
     run_parser.add_argument("scenario", help="Path to scenario YAML file")
 
     bench_parser = subparsers.add_parser("benchmark", help="Run benchmarks for a runtime")
+    bench_parser.add_argument("--verbose", action="store_true", help=argparse.SUPPRESS)
     bench_parser.add_argument("--runtime", default="perl", help="Runtime name (e.g., perl, python)")
     bench_parser.add_argument("--parallel", action="store_true", help="Run scenarios in parallel")
     bench_parser.add_argument("--workers", type=int, default=None, help="Number of parallel workers (default: CPU count)")
 
     report_parser = subparsers.add_parser("report", help="Generate a summary report")
-    report_parser.add_argument("--format", choices=["markdown", "html"], default="markdown", help="Output format")
+    report_parser.add_argument("--verbose", action="store_true", help=argparse.SUPPRESS)
+    report_parser.add_argument("--format", choices=["markdown", "html"], default="html", help="Output format")
+    report_parser.add_argument("--no-open", action="store_true", help="Do not automatically open HTML report in browser")
 
     analyze_parser = subparsers.add_parser("analyze", help="Analyze a scenario or log using Gemini AI")
+    analyze_parser.add_argument("--verbose", action="store_true", help=argparse.SUPPRESS)
     analyze_parser.add_argument("input", help="Path to scenario YAML or log JSON file")
 
     subparsers.add_parser("doctor", help="Check environment and dependencies")
