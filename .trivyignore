@@ -1,2 +1,12 @@
+
 # Ignore all critical perl-base CVEs until Debian releases a patch (approx Q2 2026)
 CVE-2026-*
+
+# CVE-2026-8376: Perl heap buffer overflow on 32-bit builds (perl-base 5.40.1-6).
+# No fixed version available in Debian upstream yet. 
+CVE-2026-8376
+
+# CVE-2026-57433: Perl Storable signed integer overflow (perl-base 5.40.1-6).
+# No fixed version available in Debian upstream yet.
+CVE-2026-57433
+
