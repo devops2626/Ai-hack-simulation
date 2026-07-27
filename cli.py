@@ -438,6 +438,9 @@ def main():
     share_parser = subparsers.add_parser("share", help="Upload benchmark report to community pastebin")
     sync_parser = subparsers.add_parser("sync", help="Pull community scenarios from a Git repo")
     sync_parser.add_argument("--repo", default="https://github.com/devops2626/ai-hack-scenarios", help="Git repository URL")
+    notify_parser = subparsers.add_parser("notify", help="Send benchmark summary to Slack")
+    notify_parser.add_argument("--webhook", help="Slack webhook URL (overrides SLACK_WEBHOOK_URL env var)")
+    notify_parser.add_argument("--channel", help="Override default channel (optional)")
 
     args = parser.parse_args()
 
@@ -454,7 +457,68 @@ def main():
     elif args.command == "share":
         cmd_share(args)
     elif args.command == "sync":
+    elif args.command == "notify":
+        cmd_notify(args)
         cmd_sync(args)
 
 if __name__ == "__main__":
     main()
+
+def cmd_notify(args):
+    """Send benchmark summary to Slack via webhook."""
+    import requests
+    # 1. Get webhook URL
+    webhook_url = args.webhook or os.environ.get("SLACK_WEBHOOK_URL")
+    if not webhook_url:
+        print("[ERROR] No Slack webhook URL provided. Set SLACK_WEBHOOK_URL env var or use --webhook.")
+        return
+
+    # 2. Find the latest benchmark report
+    report_files = glob.glob("reports/benchmark_*.json")
+    if not report_files:
+        print("[ERROR] No benchmark reports found. Run a benchmark first.")
+        return
+    latest = max(report_files, key=os.path.getctime)
+    with open(latest, "r") as f:
+        data = json.load(f)
+
+    # 3. Build a summary message
+    total = data.get("total", 0)
+    passed = data.get("passed", 0)
+    detected = data.get("detected", 0)
+    avg_dur = data.get("duration_stats", {}).get("avg", 0)
+    runtime = data.get("runtime", "unknown")
+    timestamp = data.get("timestamp", "unknown")
+
+    # Format results as a bullet list
+    results_lines = []
+    for r in data.get("results", [])[:10]:  # Limit to 10 for readability
+        status = "✅" if r["status"] == "passed" else "❌"
+        scenario = os.path.basename(r.get("scenario", "unknown"))
+        results_lines.append(f"• {status} {scenario} ({r.get('duration_seconds', 0):.2f}s)")
+
+    results_text = "\n".join(results_lines) if results_lines else "No detailed results."
+
+    message = f"""
+*AI-Hack-Simulation Benchmark Report*
+• Runtime: `{runtime}`
+• Timestamp: `{timestamp}`
+• Total scenarios: `{total}`
+• ✅ Passed: `{passed}`
+• ❌ Vulnerabilities detected: `{detected}`
+• ⏱️ Avg duration: `{avg_dur:.3f}s`
+
+*Details:*
+{results_text}
+    """.strip()
+
+    # 4. Send to Slack
+    payload = {"text": message}
+    try:
+        resp = requests.post(webhook_url, json=payload, timeout=10)
+        if resp.status_code == 200:
+            print("[NOTIFY] Benchmark summary sent to Slack successfully!")
+        else:
+            print(f"[ERROR] Slack notification failed (status {resp.status_code}): {resp.text}")
+    except Exception as e:
+        print(f"[ERROR] Could not send notification: {e}")
