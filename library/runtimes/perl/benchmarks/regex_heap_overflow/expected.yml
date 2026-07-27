@@ -1,0 +1,4 @@
+exit_code: 139   # SIGSEGV on 32-bit builds
+output_contains: []
+output_does_not_contain:
+  - "compiled successfully"
