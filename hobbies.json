@@ -1,0 +1,44 @@
+{
+  "templates": [
+    {
+      "id": 1,
+      "name": "Tech Enthusiast",
+      "hobbies": ["Coding", "Hackathons", "AI Research", "Open Source"]
+    },
+    {
+      "id": 2,
+      "name": "Creative Maker",
+      "hobbies": ["3D Printing", "Electronics", "DIY Robotics", "Woodworking"]
+    },
+    {
+      "id": 3,
+      "name": "Cyber Explorer",
+      "hobbies": ["CTF Challenges", "Network Security", "Cryptography", "Pen Testing"]
+    },
+    {
+      "id": 4,
+      "name": "Data Scientist",
+      "hobbies": ["Data Analysis", "Machine Learning", "Data Visualization", "Statistics"]
+    },
+    {
+      "id": 5,
+      "name": "Cloud Architect",
+      "hobbies": ["Serverless", "Kubernetes", "DevOps", "Infrastructure as Code"]
+    },
+    {
+      "id": 6,
+      "name": "Game Dev",
+      "hobbies": ["Unity/Godot", "Pixel Art", "Game Design", "Storytelling"]
+    },
+    {
+      "id": 7,
+      "name": "Biohacker",
+      "hobbies": ["Wearables", "Health Analytics", "DIY Biology", "Neuroscience"]
+    },
+    {
+      "id": 8,
+      "name": "AI Artist",
+      "hobbies": ["Prompt Engineering", "Generative Art", "Audio Synthesis", "Computer Vision"]
+    }
+  ]
+}

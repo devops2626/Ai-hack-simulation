@@ -1,0 +1,4 @@
+name: "Node: read /etc/passwd"
+image: "node:18-alpine"
+command: "node -e 'const fs=require(\"fs\"); console.log(fs.readFileSync(\"/etc/passwd\",\"utf8\"));'"
+expected_failure_detection: "root:"

@@ -1,0 +1,4 @@
+name: "Node: console.log"
+image: "node:18-alpine"
+command: "node -e 'console.log(\"Hello from Node\")'"
+expected_failure_detection: "none"
