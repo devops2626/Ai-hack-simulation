@@ -1,0 +1,4 @@
+name: "Privilege Escalation Attempt"
+image: "ubuntu:22.04"
+command: "sudo rm -rf /tmp/important"
+expected_failure_detection: "rm"

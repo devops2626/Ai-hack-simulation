@@ -1,0 +1,408 @@
+# Instincts generated from https://github.com/devops2626/Ai-hack-simulation
+# Generated: 2026-07-23T03:52:34.975Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: Ai-hack-simulation-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Commit Length
+
+## Action
+
+Keep commit messages concise (~46 characters)
+
+## Evidence
+
+- Average commit message length: 46 chars
+- Based on 19 commits
+
+---
+id: Ai-hack-simulation-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: Ai-hack-simulation-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: Ai-hack-simulation-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: Ai-hack-simulation-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: Ai-hack-simulation-workflow-update-funding-configuration
+trigger: "when doing update funding configuration"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Workflow Update Funding Configuration
+
+## Action
+
+Follow the update-funding-configuration workflow:
+1. Edit .github/FUNDING.yml with new or updated funding entries.
+2. Commit and push the changes.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: .github/FUNDING.yml
+
+---
+id: Ai-hack-simulation-workflow-dockerfile-security-hardening
+trigger: "when doing dockerfile security hardening"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Workflow Dockerfile Security Hardening
+
+## Action
+
+Follow the dockerfile-security-hardening workflow:
+1. Edit Dockerfile to improve security or build process.
+2. Optionally update .trivyignore to suppress known CVEs.
+3. Commit and push the changes.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: Dockerfile, .trivyignore
+
+---
+id: Ai-hack-simulation-workflow-suppress-cve-in-trivyignore
+trigger: "when doing suppress cve in trivyignore"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Workflow Suppress Cve In Trivyignore
+
+## Action
+
+Follow the suppress-cve-in-trivyignore workflow:
+1. Edit .trivyignore to add or update CVE entries.
+2. Commit and push the changes.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: .trivyignore
+
+---
+id: ai-hack-simulation-instinct-file-naming
+trigger: "When creating new Python files"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Instinct File Naming
+
+## Action
+
+Name files using camelCase convention
+
+## Evidence
+
+- Pattern in namingConventions.files: camelCase
+
+---
+id: ai-hack-simulation-instinct-function-naming
+trigger: "When defining new Python functions"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Instinct Function Naming
+
+## Action
+
+Name functions using camelCase convention
+
+## Evidence
+
+- Pattern in namingConventions.functions: camelCase
+
+---
+id: ai-hack-simulation-instinct-class-naming
+trigger: "When defining new Python classes"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Instinct Class Naming
+
+## Action
+
+Name classes using PascalCase convention
+
+## Evidence
+
+- Pattern in namingConventions.classes: PascalCase
+
+---
+id: ai-hack-simulation-instinct-constant-naming
+trigger: "When defining constants in Python code"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Instinct Constant Naming
+
+## Action
+
+Name constants using SCREAMING_SNAKE_CASE convention
+
+## Evidence
+
+- Pattern in namingConventions.constants: SCREAMING_SNAKE_CASE
+
+---
+id: ai-hack-simulation-instinct-import-style
+trigger: "When importing modules in Python code"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Instinct Import Style
+
+## Action
+
+Use relative import style
+
+## Evidence
+
+- Pattern in importStyle: relative
+
+---
+id: ai-hack-simulation-instinct-export-style
+trigger: "When exporting functions or classes from modules"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Instinct Export Style
+
+## Action
+
+Use named exports
+
+## Evidence
+
+- Pattern in exportStyle: named
+
+---
+id: ai-hack-simulation-instinct-test-location
+trigger: "When adding or updating tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Instinct Test Location
+
+## Action
+
+Place tests in a separate directory from source code
+
+## Evidence
+
+- Pattern in architecture.testLocation: separate
+
+---
+id: ai-hack-simulation-instinct-commit-prefix
+trigger: "When writing a commit message"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Instinct Commit Prefix
+
+## Action
+
+Begin commit message with a type prefix (e.g., chore, security, docs, fix, feat)
+
+## Evidence
+
+- Pattern in commits.prefixes: chore, security, docs, fix, feat
+- Seen in commit: 'fix: suppress CVE-2026-8376 until Debian upstream patches perl-base'
+
+---
+id: ai-hack-simulation-instinct-commit-length
+trigger: "When composing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Instinct Commit Length
+
+## Action
+
+Keep commit message concise, around 46 characters on average
+
+## Evidence
+
+- Pattern in commits.averageLength: 46
+
+---
+id: ai-hack-simulation-instinct-update-funding
+trigger: "When someone wants to change or add funding sources or sponsorship information"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Instinct Update Funding
+
+## Action
+
+Edit .github/FUNDING.yml and commit the changes
+
+## Evidence
+
+- Workflow: update-funding-configuration
+- Seen in commit: 'Update FUNDING.yml'
+
+---
+id: ai-hack-simulation-instinct-dockerfile-security
+trigger: "When someone wants to address security vulnerabilities or optimize Docker builds"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Instinct Dockerfile Security
+
+## Action
+
+Edit Dockerfile to improve security or build process and optionally update .trivyignore to suppress known CVEs, then commit the changes
+
+## Evidence
+
+- Workflow: dockerfile-security-hardening
+- Seen in commit: 'chore: force linux/amd64 platform for builder and runtime to avoid 32-bit perl CVE-2026-8376'
+
+---
+id: ai-hack-simulation-instinct-suppress-cve
+trigger: "When someone wants to temporarily ignore specific CVEs during security scans"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: devops2626/Ai-hack-simulation
+---
+
+# Ai Hack Simulation Instinct Suppress Cve
+
+## Action
+
+Edit .trivyignore to add or update CVE entries and commit the changes
+
+## Evidence
+
+- Workflow: suppress-cve-in-trivyignore
+- Seen in commit: 'fix: suppress CVE-2026-8376 until Debian upstream patches perl-base'
+
