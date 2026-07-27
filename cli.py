@@ -443,7 +443,7 @@ def cmd_notify(args):
     for r in data.get("results", [])[:10]:
         status = "PASS" if r["status"] == "passed" else "FAIL"
         scenario = os.path.basename(r.get("scenario", "unknown"))
-        lines.append(f"• {status} {scenario} ({r.get(duration_seconds, 0):.2f}s)")
+        lines.append(f"• {status} {scenario} ({r.get('duration_seconds', 0):.2f}s)")
     message = "\n".join(lines)
     payload = {"text": message}
     try:
