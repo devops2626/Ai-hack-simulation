@@ -1,0 +1,4 @@
+name: "Python: simple echo"
+image: "python:3.11-slim"
+command: "python -c 'print(\"Hello from Python\")'"
+expected_failure_detection: "none"

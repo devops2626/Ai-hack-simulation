@@ -1,0 +1,4 @@
+name: "Python: os.system call"
+image: "python:3.11-slim"
+command: "python -c 'import os; os.system(\"id\")'"
+expected_failure_detection: "uid="
